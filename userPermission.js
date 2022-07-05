@@ -13,5 +13,5 @@ function dedicatedBook(user, books) {
 
 module.exports = {
     adminControl,
-    dedicatedBook,
+    dedicatedBook
 }

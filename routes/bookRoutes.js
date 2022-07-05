@@ -3,6 +3,31 @@ const router = express.Router()
 const bookModel = require('../model/bookSchema')
 const { userAuth } = require('../userAuth')
 const { adminControl, dedicatedBook } = require('../userPermission')
+const multer = require('multer')
+
+const imageStorage = multer.diskStorage({
+    destination: function (req, file, callbackFn) {
+        callbackFn(null, './uploads')
+    },
+    filename: function (req, file, callbackFn) {
+        callbackFn(null, file.originalname)
+    }
+})
+
+const imageFilter = (req, file, callbackFn) => {
+    if (file.mimetype === 'image/png' || file.mimetype === 'image/jpg') {
+        callbackFn(null, true)
+    } else {
+        callbackFn(null, false)
+    }
+}
+// const upload = multer({dest: 'uploads/'})
+const upload = multer(
+    {
+        storage: imageStorage,
+        fileFilter: imageFilter
+    }
+)
 
 router.get('/', userAuth, async (req, res) => {
     let allBooks = await bookModel.find()
@@ -13,11 +38,12 @@ router.get('/:id', userAuth, adminAuth, getBook, async (req, res) => {
     res.json(req.book)
 })
 
-router.post('/', async (req, res) => {
+router.post('/', upload.single('bookInfo'), async (req, res) => {
+    console.log(req.file)
     const addBook = new bookModel({
         authorId: req.body.authorId,
         bookName: req.body.bookName,
-        bookInfo: req.body.bookInfo,
+        bookInfo: req.file.path,
         authorName: req.body.authorName,
         bookPage: req.body.bookPage,
         bookPrice: req.body.bookPrice,

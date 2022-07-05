@@ -6,6 +6,7 @@ const bodyParser = require('body-parser')
 const dotenv = require('dotenv')
 dotenv.config()
 
+
 const dbUrl = process.env.MONGO_URL || "mongodb://localhost/bookHouse"
 mongoose.connect(dbUrl)
 const mongoDbConnection = mongoose.connection
@@ -22,6 +23,7 @@ app.use(bodyParser.json())
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }));
 app.use(checkUserId)
+app.use('./uploads', express.static('uploads'))
 app.use('/books', bookRoutes)
 
 function checkUserId(req, res, next) {
